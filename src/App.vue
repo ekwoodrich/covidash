@@ -1,7 +1,8 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <img src="https://img.icons8.com/color/48/000000/coronavirus.png"/>
+    <h2>covidash</h2>
+    <HelloWorld/>
   </div>
 </template>
 
