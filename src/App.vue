@@ -56,7 +56,7 @@
     <v-main>
       <v-container class="fill-height" fluid>
         <v-row>
-          <CovidChart></CovidChart>
+          <CovidChart :chart-data="cases"></CovidChart>
         </v-row>
         <v-row>
           <v-col cols="12" sm="4">
@@ -104,6 +104,7 @@
 
     <v-footer app>
       <span>&copy; {{ new Date().getFullYear() }}</span>
+      <a href="https://github.com/ekwoodrich/covidash">View on Github</a>
     </v-footer>
   </v-app>
 </template>
@@ -119,17 +120,48 @@ export default {
     source: String
   },
   data: () => ({
-    drawer: null
+    drawer: null,
+    cases: null,
+    testData: {
+      labels: ["May 4th", "June 10th", "July 4th"],
+      datasets: [
+        {
+          label: "First data",
+          backgroundColor: "#f87979",
+          data: [1, 5, 3]
+        }
+      ]
+    }
   }),
   created() {
     this.$vuetify.theme.dark = true;
   },
-  mounted: () => {
+  mounted: function() {
     console.log("mounted");
+    this.loadHistorical();
   },
   methods: {
-    load: () => {
-      console.log("loading from covid tracking project...");
+    loadHistorical: function() {
+      console.log("loading historical data...");
+      fetch("https://covidtracking.com/api/v1/us/daily.json")
+        .then(response => response.json())
+        .then(data => {
+          let recentCases = data.slice(0, 50).reverse();
+          console.log(recentCases);
+          this.cases = {
+            labels: recentCases.map(day => day.date),
+            datasets: [
+              {
+                label: "Total cases",
+                backgroundColor: "#f87979",
+                data: recentCases.map(day => day.positive)
+              }
+            ]
+          };
+        });
+    },
+    loadCurrent: function() {
+      console.log("loading current data...");
       fetch("https://covidtracking.com/api/v1/us/current.json")
         .then(response => response.json())
         .then(data => console.log(data));
