@@ -55,12 +55,7 @@
 
     <v-main>
       <v-container class="fill-height" fluid>
-        <v-row align="center" justify="center">
-          <v-col class="shrink">
-            <button v-on:click="load">Load</button>
-          </v-col>
-        </v-row>
-        <v-row no-gutters>
+        <v-row>
           <v-col cols="12" sm="4">
             <v-card class="pa-2" outlined tile>
               <v-card-title>Total Deaths</v-card-title>
@@ -81,7 +76,7 @@
           </v-col>
         </v-row>
 
-        <v-row no-gutters>
+        <v-row>
           <v-col cols="12" sm="4">
             <v-card class="pa-2" outlined tile>
               <v-card-title>Hospitalized (daily increase)</v-card-title>
@@ -121,7 +116,9 @@ export default {
   created() {
     this.$vuetify.theme.dark = true;
   },
-  mounted: () => {},
+  mounted: () => {
+    console.log("mounted");
+  },
   methods: {
     load: () => {
       console.log("loading from covid tracking project...");
