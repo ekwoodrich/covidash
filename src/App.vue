@@ -56,25 +56,25 @@
     <v-main>
       <v-container class="fill-height" fluid>
         <v-row>
-          <CovidChart :chart-data="cases"></CovidChart>
+          <CovidChart :chart-data="cases" v-bind:width="1000"></CovidChart>
         </v-row>
         <v-row>
           <v-col cols="12" sm="4">
             <v-card class="pa-2" outlined tile>
+              <v-card-title>Total Cases</v-card-title>
+              <v-card-text>{{current.totalCases.toLocaleString()}}</v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="12" sm="4">
+            <v-card class="pa-2" outlined tile>
               <v-card-title>Total Deaths</v-card-title>
-              <v-card-text>12,300</v-card-text>
+              <v-card-text>{{current.totalDeaths.toLocaleString()}}</v-card-text>
             </v-card>
           </v-col>
           <v-col cols="12" sm="4">
             <v-card class="pa-2" outlined tile>
-              <v-card-title>New Deaths</v-card-title>
-              <v-card-text>512</v-card-text>
-            </v-card>
-          </v-col>
-          <v-col cols="12" sm="4">
-            <v-card class="pa-2" outlined tile>
-              <v-card-title>Hospitalized (currently)</v-card-title>
-              <v-card-text>512</v-card-text>
+              <v-card-title>Current Hospitalized</v-card-title>
+              <v-card-text>{{current.currentHospitalized.toLocaleString()}}</v-card-text>
             </v-card>
           </v-col>
         </v-row>
@@ -82,20 +82,20 @@
         <v-row>
           <v-col cols="12" sm="4">
             <v-card class="pa-2" outlined tile>
-              <v-card-title>Hospitalized (daily increase)</v-card-title>
-              <v-card-text>12,300</v-card-text>
+              <v-card-title>New Cases</v-card-title>
+              <v-card-text>{{current.newCases.toLocaleString()}}</v-card-text>
             </v-card>
           </v-col>
           <v-col cols="12" sm="4">
             <v-card class="pa-2" outlined tile>
               <v-card-title>New Deaths</v-card-title>
-              <v-card-text>512</v-card-text>
+              <v-card-text>{{current.newDeaths.toLocaleString()}}</v-card-text>
             </v-card>
           </v-col>
           <v-col cols="12" sm="4">
             <v-card class="pa-2" outlined tile>
-              <v-card-title>Total Hospitalized</v-card-title>
-              <v-card-text>512</v-card-text>
+              <v-card-title>New Hospitalized</v-card-title>
+              <v-card-text>{{current.newHospitalized.toLocaleString()}}</v-card-text>
             </v-card>
           </v-col>
         </v-row>
@@ -122,15 +122,13 @@ export default {
   data: () => ({
     drawer: null,
     cases: null,
-    testData: {
-      labels: ["May 4th", "June 10th", "July 4th"],
-      datasets: [
-        {
-          label: "First data",
-          backgroundColor: "#f87979",
-          data: [1, 5, 3]
-        }
-      ]
+    current: {
+      totalCases: null,
+      newCases: null,
+      totalDeaths: null,
+      newDeaths: null,
+      currentHospitalized: null,
+      newHospitalized: null
     }
   }),
   created() {
@@ -139,6 +137,7 @@ export default {
   mounted: function() {
     console.log("mounted");
     this.loadHistorical();
+    this.loadCurrent();
   },
   methods: {
     loadHistorical: function() {
@@ -146,15 +145,15 @@ export default {
       fetch("https://covidtracking.com/api/v1/us/daily.json")
         .then(response => response.json())
         .then(data => {
-          let recentCases = data.slice(0, 50).reverse();
+          let recentCases = data.slice(0, 200).reverse();
           console.log(recentCases);
           this.cases = {
             labels: recentCases.map(day => day.date),
             datasets: [
               {
-                label: "Total cases",
+                label: "Daily Positive",
                 backgroundColor: "#f87979",
-                data: recentCases.map(day => day.positive)
+                data: recentCases.map(day => day.positiveIncrease)
               }
             ]
           };
@@ -164,7 +163,14 @@ export default {
       console.log("loading current data...");
       fetch("https://covidtracking.com/api/v1/us/current.json")
         .then(response => response.json())
-        .then(data => console.log(data));
+        .then(data => {
+          this.current.newCases = data[0].positiveIncrease;
+          this.current.totalCases = data[0].positive;
+          this.current.newDeaths = data[0].deathIncrease;
+          this.current.totalDeaths = data[0].death;
+          this.current.currentHospitalized = data[0].hospitalizedCurrently;
+          this.current.newHospitalized = data[0].hospitalizedIncrease;
+        });
     }
   }
 };
