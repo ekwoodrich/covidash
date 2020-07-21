@@ -56,6 +56,9 @@
     <v-main>
       <v-container class="fill-height" fluid>
         <v-row>
+          <CovidChart></CovidChart>
+        </v-row>
+        <v-row>
           <v-col cols="12" sm="4">
             <v-card class="pa-2" outlined tile>
               <v-card-title>Total Deaths</v-card-title>
@@ -106,7 +109,12 @@
 </template>
 
 <script>
+import CovidChart from "./components/CovidChart";
+
 export default {
+  components: {
+    CovidChart
+  },
   props: {
     source: String
   },
